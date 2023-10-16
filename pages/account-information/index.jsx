@@ -100,7 +100,7 @@ export default function index() {
         </p>
         <form onSubmit={handleSubmit(onSubmitAccountInfo)}>
           <div className="flex gap-[16px] items-center mb-[24px]">
-            <SiteImage src={userInfo?.profile_picture} />
+            <SiteImage src={userInfo?.profile_picture} className="manage__account--image" />
             <label htmlFor="image" className="manage__account--dropimage">
               <div className="content">
                 <h5>Profile Picture</h5>

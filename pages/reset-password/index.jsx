@@ -63,7 +63,7 @@ export default function index() {
     <section className='login'>
       <AuthCard title='Set a new Password' text='Please set a new password to update it to your account' logo={false}>
         <form onSubmit={handleSubmit(onResetPasword)}>
-          <div className="grid grid-cols-1 gap-y-[24px]">
+          <div className="grid grid-cols-1">
             <InputField register={register} errors={errors} 
             errorMessage={{ required: 'Password is required' , 
             pattern: {
@@ -72,7 +72,20 @@ export default function index() {
               message: "Password is invalid",
               },
               
-            }}  name='new_password' label={''} placeholder={`Password (Required)`} id={'new_password'} type={'password'} maxLength={200} />
+            }}  
+            name='new_password' label={''} placeholder={`Password (Required)`} id={'new_password'} type={'password'} maxLength={200} />
+            <div
+              className="password__message flex items-center justify-start gap-[8px] mb-[24px]"
+            >
+              <SiteImage
+                alt="exclamation mark"
+                width={16}
+                height={16}
+                src="/assets/images/info_icon.svg"
+              />
+
+              <p className="">Minimum 6 characters, at least one number, and special chareacter</p>
+            </div>
             <InputField register={register} errors={errors} errorMessage={{ required: 'Confirm assword is required' , 
               pattern: {
               value: passwordRegex,

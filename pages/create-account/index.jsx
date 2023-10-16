@@ -11,6 +11,7 @@ import { useSnackbar } from "@/custom-hooks/useSnackbar";
 import { Button, Radio, RadioGroup } from "@nextui-org/react";
 import { steps } from "framer-motion";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -38,7 +39,6 @@ export default function index() {
   const [step, setStep] = useState(1);
   const [token, setToken] = useState({
     access_token: "",
-    refresh_token: "",
   });
   const [validations, setValidations] = useState([]);
   const [otherQuestion, setOtherQuestion] = useState(false);
@@ -124,7 +124,7 @@ export default function index() {
       pattern: {
         value: passwordRegex,
         // Change this regex pattern as needed
-        message: "Password is invalid",
+        message: "Minimum 6 characters, at least one number, and special character",
       },
     },
     confirmPassword: {
@@ -132,7 +132,7 @@ export default function index() {
       pattern: {
         value: passwordRegex,
         // Change this regex pattern as needed
-        message: "Confirm password is invalid",
+        message: "Minimum 6 characters, at least one number, and special character",
       },
       validate: (value) => value === password || "Passwords do not match",
     },
@@ -220,7 +220,6 @@ export default function index() {
       if (accountRes.status) {
         const tokenData = { ...token };
         tokenData.access_token = accountRes.data.access;
-        tokenData.refresh_token = accountRes.data.refresh;
         setToken(tokenData);
         setStep(step + 1);
       }
@@ -241,7 +240,6 @@ export default function index() {
       console.log("=== additionalInfoAccount response ===", accountRes);
       if (accountRes.status) {
         localStorage.setItem("token", token.access_token);
-        localStorage.setItem("refresh_token", token.refresh_token);
         // route.push('/')
         reset()
         setStep(step + 1);
@@ -255,37 +253,64 @@ export default function index() {
     }
   }
   async function submitQuestions(data){
-    let answers = {
-      educational_concerns_ids: [data.educational_concerns_ids],
-      university_id: data.university_id,
-      year_or_grade: data.year_or_grade,
-      custom_concern: data.custom_concern || "",
-      custom_university: data.other,
-    }
-    try {
-      const questionResponse = await AxiosHeadersInstance(
-        `post`,
-        `${process.env.NEXT_PUBLIC_API_KEY}/tests/get-started-test/`,
-        {},
-        {},
-        answers
-      );
-      if (questionResponse.status) {
-        route.push('/')
-        reset()
-        setStep(step + 1);
-        showSnackbar('Questions submitted successfully', 'success')
-      }else{
-        showSnackbar(questionResponse.error, 'success')
-
+    let answers;
+    if(data.other === ""){
+      answers = {
+        educational_concerns_ids: [data.educational_concerns_ids],
+        university_id: data.university_id,
+        year_or_grade: data.year_or_grade,
+        custom_concern: data.custom_concern || "",
       }
-      console.log("=== additionalInfoAccount response ===", questionResponse);
-    } catch (error) {
-      console.log("=== error in verifying ===", error);
+
+    }else{
+      answers = {
+        educational_concerns_ids: [data.educational_concerns_ids],
+        year_or_grade: data.year_or_grade,
+        custom_concern: data.custom_concern || "",
+        custom_university: data.other,
+      }
     }
+    // try {
+    //   const questionResponse = await AxiosHeadersInstance(
+    //     `post`,
+    //     `${process.env.NEXT_PUBLIC_API_KEY}/tests/get-started-test/`,
+    //     {},
+    //     {},
+    //     answers
+    //   );
+    //   if (questionResponse.status) {
+    //     route.push('/')
+    //     reset()
+    //     setStep(step + 1);
+    //     showSnackbar('Questions submitted successfully', 'success')
+    //   }else{
+    //     showSnackbar(questionResponse.error, 'success')
+
+    //   }
+    //   console.log("=== additionalInfoAccount response ===", questionResponse);
+    // } catch (error) {
+    //   console.log("=== error in verifying ===", error);
+    // }
     console.log('=== submitQuestions ===', data)
     console.log('=== object ===', answers)
   }
+
+  function handleKeyUp(e, fieldName) {
+    if (e.target.value.length === 1) {
+      const fieldIndex = Number(fieldName.split('number')[1]);
+      const nextFieldIndex = fieldIndex + 1;
+
+      if (nextFieldIndex <= 6) {
+        const nextFieldName = `number${nextFieldIndex}`;
+        const nextInput = document.querySelector(`input[name="${nextFieldName}"]`);
+
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }
+    }
+  };
+
   function renderSteps() {
     switch (step) {
       case 1:
@@ -340,6 +365,18 @@ export default function index() {
               placeholder="Password (Required)"
               onChange={handleChange}
             />
+        <div
+          className="password__message flex items-center justify-start gap-[8px] mb-[24px]"
+        >
+          <SiteImage
+            alt="exclamation mark"
+            width={16}
+            height={16}
+            src="/assets/images/info_icon.svg"
+          />
+
+          <p className="">Minimum 6 characters, at least one number, and special chareacter</p>
+        </div>
             <InputField
               register={register}
               errors={errors}
@@ -351,6 +388,10 @@ export default function index() {
               placeholder="Confirm Password (Required)"
               onChange={handleChange}
             />
+            <div className="signup__info">
+              <p>By creating an account, you agree to our <Link href={'/terms-conditions'}>terms and conditions</Link></p>
+               {/* and our private policy</p> */}
+            </div>
             <Button
               // disabled={Object.keys(errors).length > 0}
               disabled={!isValid}
@@ -372,7 +413,53 @@ export default function index() {
             >
               {/* <form onSubmit={(e) => e.preventDefault()}> */}
               <div className="grid grid-cols-6 md:gap-x-[24px] md:gap-x-[16px]">
-                <InputField
+              {Array(6)
+          .fill(null)
+          .map((_, index) => (
+            <Controller
+            key={index}
+            name={`number${index + 1}`}
+            control={control}
+            defaultValue=""
+            rules={{ required: true, maxLength: 1 }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text"
+                classNames={{
+                  input: ["form__group--input--main"],
+                  inputWrapper: ["form__group--verify"],
+                }}
+                placeholder=""
+                onKeyUp={(e) => handleKeyUp(e, field.name)}
+              />
+            )}
+          />
+          ))} {Array(6)
+          .fill(null)
+          .map((_, index) => (
+            <Controller
+            key={index}
+            name={`number${index + 1}`}
+            control={control}
+            defaultValue=""
+            rules={{ required: true, maxLength: 1 }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text"
+                classNames={{
+                  input: ["form__group--input--main"],
+                  inputWrapper: ["form__group--verify"],
+                }}
+                placeholder=""
+                onKeyUp={(e) => handleKeyUp(e, field.name)}
+              />
+            )}
+          />
+          ))}
+
+                {/* <InputField
                   register={register}
                   errors={errors}
                   errorMessage={{ required: true }}
@@ -443,7 +530,7 @@ export default function index() {
                   id={"number6"}
                   type={"text"}
                   maxLength={1}
-                />
+                /> */}
               </div>
               <div className="dont_have_acoount flex justify-center">
                 <p>Haven’t received a code?</p>

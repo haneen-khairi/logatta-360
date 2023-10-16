@@ -40,6 +40,17 @@ $size40 : 40px;
     position: absolute;
     bottom: 4px;
 }
+.password_message {
+    p{
+        color: #000;
+        font-feature-settings: 'clig' off, 'liga' off;
+        font-family: Arapey;
+        font-size: 15px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 16px; /* 106.667% */
+    }
+}
 
 .min-h90vh {
     min-height: 90vh;
@@ -420,6 +431,11 @@ $size40 : 40px;
                 line-height: normal;
             }
         }
+        &--image{
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
     }
 }
 
@@ -454,7 +470,25 @@ $size40 : 40px;
         /* 122.222% */
         margin-bottom: 24px;
     }
-
+    &__info{
+        p{
+            color: #000;
+            font-family: Arapey;
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 22px; /* 122.222% */
+            margin-bottom: 30px;
+            a{
+                color: #0C436F;
+                font-family: Arapey;
+                font-size: 18px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 22px;
+            }
+        }
+    }
     &__button {
         width: 100%;
     }
@@ -815,6 +849,7 @@ margin-bottom: 24px;
     padding: 40px 0;
     max-width: calc(100% - 360px);
     margin: 0 auto;
+    min-height: 90vh;
     @media screen and (max-width: 768px) {
         max-width: 100%;
 

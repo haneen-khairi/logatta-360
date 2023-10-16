@@ -93,7 +93,7 @@ export default function InputField({
               input: ["form__group--input--main"],
               inputWrapper: ["form__group--verify"],
             }}
-            // onChange={onValueChange}
+            onKeyUp={onValueChange}
             type={type}
             defaultValue={initialValue}
             style={style}

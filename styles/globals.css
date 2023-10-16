@@ -30,6 +30,16 @@
   bottom: 4px;
 }
 
+.password_message p {
+  color: #000;
+  font-feature-settings: "clig" off, "liga" off;
+  font-family: Arapey;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 106.667% */
+}
+
 .min-h90vh {
   min-height: 90vh;
 }
@@ -372,6 +382,11 @@
   font-weight: 400;
   line-height: normal;
 }
+.manage__account--image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
 
 .signup {
   padding: 40px 0;
@@ -405,6 +420,23 @@
   line-height: 22px;
   /* 122.222% */
   margin-bottom: 24px;
+}
+.signup__info p {
+  color: #000;
+  font-family: Arapey;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px; /* 122.222% */
+  margin-bottom: 30px;
+}
+.signup__info p a {
+  color: #0C436F;
+  font-family: Arapey;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
 }
 .signup__button {
   width: 100%;
@@ -718,6 +750,7 @@
   padding: 40px 0;
   max-width: calc(100% - 360px);
   margin: 0 auto;
+  min-height: 90vh;
 }
 @media screen and (max-width: 768px) {
   .tests {

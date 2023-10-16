@@ -22,48 +22,15 @@ export default function index() {
   } = useForm({
     mode: 'onChange'
   });
+  const [rememberMeStatus, setRememberMeStatus] = useState(false)
   const route =  useRouter()
-  const [validation, setValidation] = useState([])
-  const [disable, setDisable] = useState(true)
-  const [userObject , setUserObject] = useState({
-    email: "",
-    password: ""
-  })
-  // function onGetUserData(event){
-  //   const {name , value} = event?.target
-  //   const userData = {...userObject}
-  //   let validationArray = [];
-  //   userData[name] = value.trim()
-  //   console.log('getting data...' , userData)
-  //   setUserObject(userData)
-  //   if(userData.email === ""){
-  //     validationArray.push({name: 'email', error: 'Email is required'})
-  //     setDisable(true)
-  //   }else if(!emailRegex.test(userData.email)){
-  //     validationArray.push({name: 'email', error: 'Email is invalid'})
-  //     setDisable(true)
-  //   }else if(userData.password === ""){
-  //     validationArray.push({name: 'password', error: 'Password is required'})
-  //     setDisable(true)
-  //   }else if(!passwordRegex.test(userData.password)){
-  //     validationArray.push({name: 'password', error: 'Password is invalid'})
-  //     setDisable(true)
-  //   }else{
-  //     setDisable(false)
-  //   }
-
-  //   setValidation(validationArray)
-  // }
-  // function resetForm(){
-  //   setUserObject({
-  //     email: "",
-  //     password: ""
-  //   })
-  //   loginForm.current.reset()
-  // }
+  function rememberMe(value){
+    setRememberMeStatus(value)
+  }
   function onLogin(data){
     // event.preventDefault();
-    console.log('=== login data ===', data)
+    // console.log('=== login data ===', data)
+    // console.log(rememberMeStatus)
     loginLogic(data)
   }
   async function loginLogic(data){
@@ -71,8 +38,14 @@ export default function index() {
       const respLogin = await AxiosInstance(`post`, `${process.env.NEXT_PUBLIC_API_KEY}/account/login/`, {}, {}, data)
       console.log('=== res login ===' , respLogin)
       if(respLogin.status){
-        localStorage.setItem('token', respLogin.data.access)
-        localStorage.setItem('refresh_token', respLogin.data.refresh)
+        if(rememberMeStatus){
+          // localStorage.setItem('token', respLogin.data.refresh)
+          localStorage.setItem('token', respLogin.data.access)
+          console.log('=== refresh_token ===')
+        }else{
+          localStorage.setItem('token', respLogin.data.access)
+          console.log('=== access_token ===')
+        }
         route.push('/')
         reset()
       }else{
@@ -123,7 +96,9 @@ export default function index() {
             errors={errors}
             name='password' label={''} placeholder={`••••••••`} id={'password'} type={'password'} maxLength={200} />
             <div className="login__remember mb-[24px]">
-              <Checkbox >Remember Me</Checkbox>
+              <Checkbox 
+              onValueChange={rememberMe}
+              >Remember Me</Checkbox>
               <Link href={'/forget-password'} className='login__remember--forget'>Forgot Password?</Link>
             </div>
             <Button className='special_button' disabled={!isValid ? true : false} type='submit'>Login</Button>

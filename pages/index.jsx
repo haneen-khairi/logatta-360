@@ -79,7 +79,7 @@ export default function index() {
             <span className="card__meeting--span">Meeting on</span>
             <h5 className="card__meeting--date">{formatDate(meeting?.meeting_datetime)}</h5>
             <p className='card__empty--content-paragraph'>{meeting?.description}</p>
-            <Button as={Link} href={meeting?.url || ''} type='submit' className="card__meeting--button special_button" onClick={onNavigateMeeting}>Join</Button>
+            <Button as={Link} href={meeting?.url || 'https://google.com'} target='_blank' type='submit' className="card__meeting--button special_button" onClick={onNavigateMeeting}>Join</Button>
         </div>
         
     </div>}

@@ -49,15 +49,15 @@ export default function index() {
         <p className="tests__content--paragraph">We recommend you take the following tests</p>
       </div>
       <div className="tests__cards">
-        <div className="grid grid-col-1">
+      {pdfLink !== "null" && <div className="grid grid-col-1">
           <div className="tests__cards--full">
             <h4 className="tests__cards--full-header">Your Brain Profile Assessment Results</h4>
             <p className="tests__cards--full-paragraph">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-            <Button disabled={pdfLink === "null" ? true : false} color='white' className="tests__cards--full-button">
+            <Button  color='white' className="tests__cards--full-button">
             Download PDF <SiteImage src={'/assets/images/download_icon.svg'} />
             </Button>
           </div>
-        </div>
+        </div>}
         <div className="grid lg:grid-cols-2 lg:grid-cols-1 lg:gap-x-[40px] sm:mb-[24px]  ">
           {tests.length > 0 && tests.map((test) => <TestsCard key={test.id} imageSrc={test.image} title={test.title} link={test.url} />)}
         </div>

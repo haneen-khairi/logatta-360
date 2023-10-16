@@ -4,12 +4,12 @@ import InputField from "@/Components/fields/InputField";
 import { AxiosInstance } from "@/Functions/AxiosInstance";
 import MainLayout from "@/Layouts/MainLayout";
 import { useSnackbar } from "@/custom-hooks/useSnackbar";
-import { Button } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 export default function index() {
   const route = useRouter()
@@ -19,6 +19,7 @@ export default function index() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
@@ -32,10 +33,24 @@ export default function index() {
 
     console.log('=== number ===',+verification_code); 
     // const verification_code = parseInt(Object.values(data).join(''));
-    console.log("===submit===", data);
     verifyEmailApi(verification_code)
     // reset()
   }
+  function handleKeyUp(e, fieldName) {
+    if (e.target.value.length === 1) {
+      const fieldIndex = Number(fieldName.split('number')[1]);
+      const nextFieldIndex = fieldIndex + 1;
+
+      if (nextFieldIndex <= 6) {
+        const nextFieldName = `number${nextFieldIndex}`;
+        const nextInput = document.querySelector(`input[name="${nextFieldName}"]`);
+
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }
+    }
+  };
   function resendCode() {
     console.log("=====resend=====");
   }
@@ -79,8 +94,32 @@ export default function index() {
           logo={false}
         >
           <form onSubmit={handleSubmit(onSubmitVerify)}>
-            <div className="grid grid-cols-5 md:gap-x-[24px] sm:gap-x-[16px]">
-              <InputField
+          <div className="grid grid-cols-6 md:gap-x-[24px] md:gap-x-[16px]">
+          {Array(6)
+          .fill(null)
+          .map((_, index) => (
+            <Controller
+            key={index}
+            name={`number${index + 1}`}
+            control={control}
+            defaultValue=""
+            rules={{ required: true, maxLength: 1 }}
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text"
+                classNames={{
+                  input: ["form__group--input--main"],
+                  inputWrapper: ["form__group--verify"],
+                }}
+                placeholder=""
+                onKeyUp={(e) => handleKeyUp(e, field.name)}
+              />
+            )}
+          />
+          ))}
+      </div>
+              {/* <InputField
                 register={register}
                 errors={errors}
                 errorMessage={{ required: "Number", maxLength: 1 }}
@@ -152,7 +191,8 @@ export default function index() {
                 type={"text"}
                 maxLength={1}
               />
-            </div>
+            */}
+            {/* </div>  */}
             <Button
               className="special_button w-full"
               type="submit"
