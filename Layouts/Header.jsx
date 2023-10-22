@@ -8,7 +8,9 @@ import { useRouter } from "next/router";
 import SiteImage from "@/Components/UI/SiteImage";
 import { logout } from "@/Functions/GlobalFunctions";
 import { AxiosHeadersInstance } from "@/Functions/AxiosHeadersInstance";
-export default function Header() {
+export default function Header({
+  image = null
+}) {
   const route = useRouter()
   const [token, setToken] = useState()
   const [userInfo, setUserInfo] = useState()
@@ -94,7 +96,7 @@ export default function Header() {
                 disableRipple
                 className="p-0 bg-transparent data-[hover=true]:bg-transparent min-h  "
                 startContent={
-                  <SiteImage src={'/assets/images/Profile_photo.svg'} />
+                  <SiteImage className="navbar__profile--pic" src={userInfo?.profile_picture === "" || null ? '/assets/images/Profile_photo.svg' : image !== null ? image : userInfo?.profile_picture} />
                 }
                 endContent={
                   <SiteImage src={'/assets/images/arrow_drop_down.svg'} />

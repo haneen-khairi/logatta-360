@@ -4,6 +4,7 @@ import SiteImage from '../UI/SiteImage'
 export default function SelectMenuField({
     type,
     initialValue = "",
+    placeholder,
     name,
     style,
     label,
@@ -22,6 +23,7 @@ export default function SelectMenuField({
     console.log('=== e ====',selectedValue)
   };
   return <div className='field relative'>
+    {/* <label htmlFor={id}>{name}</label> */}
   <select
         name={name}
         className="form__group--input w-full"
@@ -33,7 +35,7 @@ export default function SelectMenuField({
         onChange={handleChange}
         {...register(name, errorMessage )}
       >
-    {/* <option value="">{initialValue}</option> */}
+    {initialValue !== "" ? <option value="" style={{display: 'none'}}>{initialValue}</option> : <option value="">{"Select on option"}</option> }
     {items.map((item, index) => <option key={index} value={item.value}>{item.name}</option> )}
       </select>
       {errors[name] && <div

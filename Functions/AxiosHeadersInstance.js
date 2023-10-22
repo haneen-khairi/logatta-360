@@ -53,6 +53,8 @@ export async function AxiosHeadersInstance(requestType, url, headers = {}, error
             console.log('=== error ===' , error)
             if(error.response.status === 401){
               window.location.href = '/'
+              localStorage.removeItem('token')
+              localStorage.removeItem('refresh_token')
             }
         // If no errorHandler is provided, simply rethrow the error
             return error;

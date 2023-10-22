@@ -12,9 +12,9 @@ import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 export default function index() {
-  const route = useRouter()
-  const { email } = route.query
-  const showSnackbar = useSnackbar()
+  const route = useRouter();
+  const { email } = route.query;
+  const showSnackbar = useSnackbar();
   const {
     register,
     handleSubmit,
@@ -26,62 +26,66 @@ export default function index() {
   });
   function onSubmitVerify(data) {
     const verification_code = Object.keys(data)
-    .filter(key => key.startsWith('number')) // Filter keys that start with 'number'
-    .sort() // Optional: Sort the keys if they might not be in order
-    .map(key => data[key]) // Map to their corresponding values
-    .join(''); // Join the values into a string
+      .filter((key) => key.startsWith("number")) // Filter keys that start with 'number'
+      .sort() // Optional: Sort the keys if they might not be in order
+      .map((key) => data[key]) // Map to their corresponding values
+      .join(""); // Join the values into a string
 
-    console.log('=== number ===',+verification_code); 
+    console.log("=== number ===", +verification_code);
     // const verification_code = parseInt(Object.values(data).join(''));
-    verifyEmailApi(verification_code)
+    verifyEmailApi(verification_code);
     // reset()
   }
   function handleKeyUp(e, fieldName) {
     if (e.target.value.length === 1) {
-      const fieldIndex = Number(fieldName.split('number')[1]);
+      const fieldIndex = Number(fieldName.split("number")[1]);
       const nextFieldIndex = fieldIndex + 1;
 
       if (nextFieldIndex <= 6) {
         const nextFieldName = `number${nextFieldIndex}`;
-        const nextInput = document.querySelector(`input[name="${nextFieldName}"]`);
+        const nextInput = document.querySelector(
+          `input[name="${nextFieldName}"]`
+        );
 
         if (nextInput) {
           nextInput.focus();
         }
       }
     }
-  };
+  }
   function resendCode() {
     console.log("=====resend=====");
   }
-  async function verifyEmailApi(data){
+  async function verifyEmailApi(data) {
     try {
       const verifyRes = await AxiosInstance(
         `post`,
         `${process.env.NEXT_PUBLIC_API_KEY}/account/password/verify/`,
         {},
         {},
-        {email , 
-          code: data}
+        { email, code: data }
       );
-      if(verifyRes.status){
-        showSnackbar(`${verifyRes.data}`,`success`)
-        reset()
-      }else{
-        showSnackbar(`${verifyRes.error}`,`error`)
+      if (verifyRes.status) {
+        showSnackbar(`${verifyRes.data}`, `success`);
+        reset();
+      } else {
+        showSnackbar(`${verifyRes.error}`, `error`);
       }
-      route.push({pathname: '/forget-password/reset-password', query: {email , code:data }})
+      route.push({
+        pathname: "/forget-password/reset-password",
+        query: { email, code: data },
+      });
     } catch (error) {
-      console.log('=== error ===', error)
+      console.log("=== error ===", error);
     }
   }
   useEffect(() => {
-    if(!route.isReady){
+    if (!route.isReady) {
       return;
     }
-  
-    console.log('=== email ===', email)
-  }, [route])
+
+    console.log("=== email ===", email);
+  }, [route]);
   return (
     <MainLayout>
       <Head>
@@ -94,32 +98,32 @@ export default function index() {
           logo={false}
         >
           <form onSubmit={handleSubmit(onSubmitVerify)}>
-          <div className="grid grid-cols-6 md:gap-x-[24px] md:gap-x-[16px]">
-          {Array(6)
-          .fill(null)
-          .map((_, index) => (
-            <Controller
-            key={index}
-            name={`number${index + 1}`}
-            control={control}
-            defaultValue=""
-            rules={{ required: true, maxLength: 1 }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text"
-                classNames={{
-                  input: ["form__group--input--main"],
-                  inputWrapper: ["form__group--verify"],
-                }}
-                placeholder=""
-                onKeyUp={(e) => handleKeyUp(e, field.name)}
-              />
-            )}
-          />
-          ))}
-      </div>
-              {/* <InputField
+            <div className="grid grid-cols-6 md:gap-x-[24px] md:gap-x-[16px]">
+              {Array(6)
+                .fill(null)
+                .map((_, index) => (
+                  <Controller
+                    key={index}
+                    name={`number${index + 1}`}
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true, maxLength: 1 }}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text"
+                        classNames={{
+                          input: ["form__group--input--main"],
+                          inputWrapper: ["form__group--verify"],
+                        }}
+                        placeholder=""
+                        onKeyUp={(e) => handleKeyUp(e, field.name)}
+                      />
+                    )}
+                  />
+                ))}
+            </div>
+            {/* <InputField
                 register={register}
                 errors={errors}
                 errorMessage={{ required: "Number", maxLength: 1 }}

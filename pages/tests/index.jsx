@@ -1,5 +1,6 @@
 import AuthCard from '@/Components/UI/AuthCard'
 import EmptyStateCard from '@/Components/UI/EmptyStateCard'
+import Loaders from '@/Components/UI/Loaders'
 import SiteImage from '@/Components/UI/SiteImage'
 import TestsCard from '@/Components/UI/TestsCard'
 import InputField from '@/Components/fields/InputField'
@@ -14,6 +15,7 @@ import  { useEffect, useState } from 'react'
 export default function index() {
   const route = useRouter()
   const [pdfLink, setPdfLink] = useState()
+  const [isLoading, setIsLoading] = useState(true)
   const [tests, setTests] = useState([
   ])
   async function getTests(){
@@ -23,16 +25,23 @@ export default function index() {
       if(testRes.status){
         setTests(testRes.data.suggested_urls)
         setPdfLink(testRes.data.pdf_results_url)
+        setIsLoading(false)
       }
     } catch (error) {
       console.log('=== error tests ===', error)
 
+    } finally {
+      // Set isLoading to false whether the token check succeeds or fails
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     }
   }
   useEffect(() => {
     if(!route.isReady){
       return
     }
+    setIsLoading(true)
     getTests()
     return () => {
       
@@ -43,7 +52,10 @@ export default function index() {
     <Head>
       <title>{`${process.env.NEXT_PUBLIC_TITLE}Tests`}</title>
     </Head>
-    {tests.length > 0 ? <section className='tests'>
+    {isLoading ? (
+      <Loaders />
+    ):
+      tests.length > 0 ? <section className='tests'>
       <div className="tests__content">
         <h4 className="tests__content--header">Tests</h4>
         <p className="tests__content--paragraph">We recommend you take the following tests</p>
@@ -53,7 +65,7 @@ export default function index() {
           <div className="tests__cards--full">
             <h4 className="tests__cards--full-header">Your Brain Profile Assessment Results</h4>
             <p className="tests__cards--full-paragraph">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
-            <Button  color='white' className="tests__cards--full-button">
+            <Button as={Link} href={pdfLink} target="_blank"  color='white' className="tests__cards--full-button">
             Download PDF <SiteImage src={'/assets/images/download_icon.svg'} />
             </Button>
           </div>
@@ -63,7 +75,7 @@ export default function index() {
         </div>
       </div>
     </section> : <section className='section__single'>
-       <EmptyStateCard className='card__test' imageSrc='/assets/images/empty-test.svg' title="You haven’t reached the test yet" text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s." />
+       <EmptyStateCard className='card__test' imageSrc='/assets/images/empty-test.svg' title="You haven’t reached the plan yet" text="Our experts are currently preparing your assessment. We will get back to you soon." />
     </section>}
   </MainLayout>
   

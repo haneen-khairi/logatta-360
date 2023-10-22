@@ -8,7 +8,7 @@ import { AxiosInstance } from "@/Functions/AxiosInstance";
 import { emailRegex, passwordRegex } from "@/Functions/RegexFunction";
 import MainLayout from "@/Layouts/MainLayout";
 import { useSnackbar } from "@/custom-hooks/useSnackbar";
-import { Button, Radio, RadioGroup } from "@nextui-org/react";
+import { Button, Radio, RadioGroup , Input } from "@nextui-org/react";
 import { steps } from "framer-motion";
 import Head from "next/head";
 import Link from "next/link";
@@ -166,7 +166,6 @@ export default function index() {
       fd.append("date_of_birth", data.date_of_birth);
       fd.append("country", data.country);
       additionalInfoAccount(fd);
-      setStep(step + 1);
     } else if (step === 6) {
       if (!selectedUniversity && !otherInput) {
         setError('university_id', { type: 'manual', message: 'Please select a university or specify "other".' });
@@ -175,7 +174,7 @@ export default function index() {
       }
       submitQuestions(data)
       console.log("=== data ===", data);
-    } else{
+    } else if(step === 4 || step === 5 || step === 6){
       setStep(step + 1);
     }
   }
@@ -200,7 +199,12 @@ export default function index() {
         data
       );
       console.log("=== createAccount response ===", accountRes);
-      setStep(step + 1);
+      if(!accountRes.status){
+        showSnackbar(accountRes.error.email[0] , 'error')
+        return;
+      }else{
+        setStep(step + 1);
+      }
     } catch (error) {
       console.log("=== error in creating ===", error);
     }
@@ -215,6 +219,7 @@ export default function index() {
         {
           email: userEmail.current,
           verification_code: data,
+          remember_me: false
         }
       );
       if (accountRes.status) {
@@ -222,6 +227,9 @@ export default function index() {
         tokenData.access_token = accountRes.data.access;
         setToken(tokenData);
         setStep(step + 1);
+      }else{
+          showSnackbar(accountRes.errors , 'error')
+        
       }
       console.log("=== verifyAccount response ===", accountRes);
     } catch (error) {
@@ -270,27 +278,27 @@ export default function index() {
         custom_university: data.other,
       }
     }
-    // try {
-    //   const questionResponse = await AxiosHeadersInstance(
-    //     `post`,
-    //     `${process.env.NEXT_PUBLIC_API_KEY}/tests/get-started-test/`,
-    //     {},
-    //     {},
-    //     answers
-    //   );
-    //   if (questionResponse.status) {
-    //     route.push('/')
-    //     reset()
-    //     setStep(step + 1);
-    //     showSnackbar('Questions submitted successfully', 'success')
-    //   }else{
-    //     showSnackbar(questionResponse.error, 'success')
+    try {
+      const questionResponse = await AxiosHeadersInstance(
+        `post`,
+        `${process.env.NEXT_PUBLIC_API_KEY}/tests/get-started-test/`,
+        {},
+        {},
+        answers
+      );
+      if (questionResponse.status) {
+        route.push('/')
+        reset()
+        setStep(step + 1);
+        showSnackbar('Questions submitted successfully', 'success')
+      }else{
+        showSnackbar(questionResponse.error, 'success')
 
-    //   }
-    //   console.log("=== additionalInfoAccount response ===", questionResponse);
-    // } catch (error) {
-    //   console.log("=== error in verifying ===", error);
-    // }
+      }
+      console.log("=== additionalInfoAccount response ===", questionResponse);
+    } catch (error) {
+      console.log("=== error in verifying ===", error);
+    }
     console.log('=== submitQuestions ===', data)
     console.log('=== object ===', answers)
   }
@@ -414,28 +422,6 @@ export default function index() {
               {/* <form onSubmit={(e) => e.preventDefault()}> */}
               <div className="grid grid-cols-6 md:gap-x-[24px] md:gap-x-[16px]">
               {Array(6)
-          .fill(null)
-          .map((_, index) => (
-            <Controller
-            key={index}
-            name={`number${index + 1}`}
-            control={control}
-            defaultValue=""
-            rules={{ required: true, maxLength: 1 }}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="text"
-                classNames={{
-                  input: ["form__group--input--main"],
-                  inputWrapper: ["form__group--verify"],
-                }}
-                placeholder=""
-                onKeyUp={(e) => handleKeyUp(e, field.name)}
-              />
-            )}
-          />
-          ))} {Array(6)
           .fill(null)
           .map((_, index) => (
             <Controller
@@ -589,7 +575,7 @@ export default function index() {
               <input
                 // register={register}
                 // errors={errors}
-                {...register("image", { required: "Image is required" })}
+                {...register("image")}
                 name="image"
                 type="file"
                 id="image"

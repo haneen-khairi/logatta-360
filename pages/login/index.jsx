@@ -35,7 +35,11 @@ export default function index() {
   }
   async function loginLogic(data){
     try {
-      const respLogin = await AxiosInstance(`post`, `${process.env.NEXT_PUBLIC_API_KEY}/account/login/`, {}, {}, data)
+      const respLogin = await AxiosInstance(`post`, `${process.env.NEXT_PUBLIC_API_KEY}/account/login/`, {}, {}, {
+        email:data.email,
+        password:data.password,
+        remember_me : rememberMe
+      })
       console.log('=== res login ===' , respLogin)
       if(respLogin.status){
         if(rememberMeStatus){

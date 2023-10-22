@@ -1,3 +1,4 @@
+import Loaders from "@/Components/UI/Loaders";
 import SiteImage from "@/Components/UI/SiteImage";
 import InputField from "@/Components/fields/InputField";
 import SelectMenuField from "@/Components/fields/SelectField";
@@ -10,21 +11,50 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 export default function index() {
   const route = useRouter()
+  const showSnackbar = useSnackbar()
+  const [countries, setCountries] = useState([])
+  const [userInfo, setUserInfo] = useState()
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    control,
+    formState: { errors, isValid, isDirty },
   } = useForm({
     mode: "onChange"
   });
-  const showSnackbar = useSnackbar()
-  const [countries, setCountries] = useState([])
-  const [userInfo, setUserInfo] = useState()
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFileSrc, setSelectedFileSrc] = useState(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    let fileType = file.name?.split(".")[file.name.split(".").length - 1].toLowerCase();
+
+    const imageTypes = ['web','png','jpg','jpeg']
+    console.log('=== file ===', fileType , imageTypes.includes(fileType))
+    if(!imageTypes.includes(fileType)){
+      showSnackbar('This file is not supported' , 'error')
+      setSelectedFile(null)
+      setSelectedFileSrc(null)
+    }else{
+      setSelectedFile(file)
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileURL = e.target.result;
+          setSelectedFileSrc(fileURL);
+        };
+        reader.readAsDataURL(file);
+      }
+
+    }
+  };
+
   async function getCountries(){
     try {
       const {data} =  await AxiosHeadersInstance(`get`, `${process.env.NEXT_PUBLIC_API_KEY}/account/countries`) 
@@ -39,30 +69,38 @@ export default function index() {
     }
   }
   async function getUserInfo(){
+
     try {
       const {data} =  await AxiosHeadersInstance(`get`, `${process.env.NEXT_PUBLIC_API_KEY}/account/user/info`) 
       console.log('== user ===', data)
       setUserInfo(data)
+      let user = {
+        name: data.name,
+        date: data.date_of_birth,
+        gender: data.gender,
+        phone_number: data.phone_number,
+        country: data.country.id
+      }
+      console.log('=== user ===', user)
+      reset({...user})
     } catch (error) {
       console.log('=== error tests ===', error)
 
+    } finally {
+      setIsLoading(false)
     }
   }
   function onSubmitAccountInfo(data) {
-
-
     const fd = new FormData()
-    if(data.image.length !== 0){
-      fd.append('image', data.image[0])
+    if(selectedFile !== null){
+      fd.append('profile_picture', selectedFile)
     }
     fd.append('name', data.name === "" ? userInfo?.name : data.name)
-    fd.append('phone', data.phone === "" ? userInfo?.phone_number : data.phone )
-    fd.append('country', data.country  === "" ? userInfo?.country.id : data.date)
-    fd.append('date', data.date === "" ? userInfo?.date_of_birth : data.date)
-    fd.append('gender', data.gender)
-    console.log("===submit email===", data);
+    fd.append('phone_number', data.phone === "" ? userInfo?.phone_number : data.phone )
+    fd.append('country_id', data.country  === "" ? userInfo?.country.id : data.country)
+    fd.append('date_of_birth', data.date === "" ? userInfo?.date_of_birth : data.date)
+    fd.append('gender', data.gender === "" ? userInfo?.gender : data.gender)
     submitData(fd)
-    // reset()
   }
   async function submitData(data){
     try {
@@ -70,6 +108,7 @@ export default function index() {
       console.log(resData)
       if(resData.status){
         showSnackbar(resData.data, `success`)
+        getUserInfo()
       }else{
         showSnackbar(resData.error, `error`)
 
@@ -83,12 +122,13 @@ export default function index() {
     if(!route.isReady){
       return
     }
+    setIsLoading(true)
     getUserInfo()
     getCountries()
   }, [route])
   
   return (
-    <MainLayout>
+    <MainLayout image={selectedFileSrc}>
       <Head>
         <title>{`${process.env.NEXT_PUBLIC_TITLE}Account information`}</title>
       </Head>
@@ -98,31 +138,42 @@ export default function index() {
         <p className="manage__account--paragraph">
           You can update your data here
         </p>
-        <form onSubmit={handleSubmit(onSubmitAccountInfo)}>
+        {isLoading ? 
+          <Loaders />
+        : <form onSubmit={handleSubmit(onSubmitAccountInfo)}>
           <div className="flex gap-[16px] items-center mb-[24px]">
-            <SiteImage src={userInfo?.profile_picture} className="manage__account--image" />
+            <SiteImage src={selectedFileSrc === null ? userInfo?.profile_picture : selectedFileSrc} className="manage__account--image" />
             <label htmlFor="image" className="manage__account--dropimage">
               <div className="content">
                 <h5>Profile Picture</h5>
                 <span>Click to browse or drag and drop your files</span>
               </div>
             </label>
-            <input
-              name="image"
-              type="file"
-              id="image"
-              hidden
-              {...register('image')}
-              // register={register}
-              // errors={errors}
+            <Controller
+            name="image"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+
+              <input
+                {...field}
+                type="file"
+                id="image"
+                hidden
+                accept="image/x-png,image/png, image/jpeg, image/jpg , image/png, image/svg,  image/webp"
+                onChange={handleFileChange}
+                // {...register('image')}
+                // register={register}
+                // errors={errors}
+              />
+              )}
             />
           </div>
-          {console.log('errors', errors)}
           <div className="grid md:grid-cols-2 sm:grid-cols-1 gap-x-[24px]">
             <InputField
               register={register}
               errors={errors}
-              // errorMessage={{ required: "Full name is required" }}
+              errorMessage={{ required: "Full name is required" }}
               name="name"
               label={""}
               placeholder={"name"}
@@ -141,14 +192,14 @@ export default function index() {
               placeholder={"gender"}
               id={"gender"}
               type={"text"}
-              items={[{value:"M", name:"Male"}, {value:"F", name:"female"}]}
-              initialValue={userInfo?.gender}
+              items={[{value:"M", name:"Male"}, {value:"F", name:"Female"}]}
+              initialValue={userInfo?.gender === "M" ? "Male" : "Female"}
               maxLength={200}
             />
             <InputField
               register={register}
               errors={errors}
-              // errorMessage={{ required: "Phone is required" }}
+              errorMessage={{ required: "Phone is required" }}
               name="phone"
               label={""}
               placeholder={"phone"}
@@ -199,7 +250,7 @@ export default function index() {
               items={countries}
               name="country"
               id={"country"}
-              initialValue={userInfo?.country?.id}
+              initialValue={userInfo?.country?.name}
               maxLength={200}
             />
             <div className="form__group--links flex justify-between">
@@ -230,11 +281,11 @@ export default function index() {
           <Button
             className="special_button manage__account--button"
             type="submit"
-            disabled={!isValid ? true : false}
+            disabled={!(isValid && isDirty || selectedFileSrc !== null) ? true : false}
           >
             Save
           </Button>
-        </form>
+        </form>}
       </section>
     </MainLayout>
   );
