@@ -161,7 +161,9 @@ export default function index() {
     } else if (step === 3) {
       console.log("=== step3 ===", data);
       const fd = new FormData();
-      fd.append("profile_picture", data.image[0]);
+      if(data.image[0] !== undefined){
+        fd.append("profile_picture", data.image[0]);
+      }
       fd.append("gender", data.gender);
       fd.append("date_of_birth", data.date_of_birth);
       fd.append("country", data.country);
@@ -237,6 +239,7 @@ export default function index() {
     }
   }
   async function additionalInfoAccount(data) {
+
     try {
       const accountRes = await AxiosInstance(
         `put`,

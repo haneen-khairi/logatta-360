@@ -28,6 +28,7 @@ export default function Header({
     try {
       const {data} =  await AxiosHeadersInstance(`get`, `${process.env.NEXT_PUBLIC_API_KEY}/account/user/info`) 
       setUserInfo(data)
+      console.log('=== data ===', data)
     } catch (error) {
       console.log('=== error tests ===', error)
 
@@ -96,7 +97,7 @@ export default function Header({
                 disableRipple
                 className="p-0 bg-transparent data-[hover=true]:bg-transparent min-h  "
                 startContent={
-                  <SiteImage className="navbar__profile--pic" src={userInfo?.profile_picture === "" || null ? '/assets/images/Profile_photo.svg' : image !== null ? image : userInfo?.profile_picture} />
+                  <SiteImage className="navbar__profile--pic" src={ image !== null ? image :  userInfo?.profile_picture === null  ? '/assets/images/Profile_photo.svg'  : userInfo?.profile_picture} />
                 }
                 endContent={
                   <SiteImage src={'/assets/images/arrow_drop_down.svg'} />
