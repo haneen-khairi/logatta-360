@@ -75,7 +75,7 @@ export default function index() {
         </div>
       </div>
     </section> : <section className='section__single'>
-       <EmptyStateCard className='card__test' imageSrc='/assets/images/empty-test.svg' title="You haven’t reached the plan yet" text="Our experts are currently preparing your assessment. We will get back to you soon." />
+       <EmptyStateCard className='card__test' imageSrc='/assets/images/empty-test.svg' title="You haven’t reached the test yet" text="Our experts are currently preparing your assessment. We will get back to you soon." />
     </section>}
   </MainLayout>
   
