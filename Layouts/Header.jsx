@@ -64,14 +64,14 @@ export default function Header({
 
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
-          <Logo />
+          <Logo className="w-[80%]" />
         </NavbarBrand>
       </NavbarContent>
       
       {token ? <>
         <NavbarContent className="navbar__menu hidden sm:flex gap-4" justify="center">
-        <Link href={'/'} className="mr-[56px]">
-          <Logo />
+        <Link href={'/'} >
+          <Logo className="w-full" />
         </Link>
         <NavbarItem as={Link} href="/" isActive={route.pathname === '/' ? true : false} className="navbar__menu--link">
           {/* <Link className="" href="/"> */}
@@ -161,6 +161,11 @@ export default function Header({
 
       <NavbarContent justify="end">
         
+        <NavbarItem>
+          <Button as={Link} className="navbar__signup" href="/create-account" variant="flat">
+            sign up
+          </Button>
+        </NavbarItem>
         <NavbarItem>
           <Button as={Link} className="navbar__login" href="/login" variant="flat">
             Login
