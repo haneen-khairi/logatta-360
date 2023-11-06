@@ -109,7 +109,7 @@ $size40 : 40px;
             margin-right: 56px;
             color: #000;
             font-family: League Spartan;
-            font-size: 20px;
+            font-size: 24px;
             font-style: normal;
             font-weight: 500;
             line-height: 32px;
@@ -132,6 +132,25 @@ $size40 : 40px;
         &:hover {
             background-color: $primaryColor;
             color: #fff;
+
+        }
+    }
+    &__signup {
+        color: #fff;
+        padding: 8px 48px;
+        background: linear-gradient(90deg, #48016D 0%, #2483CE 149.29%);
+        font-family: League Spartan;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+        border-radius: 28px;
+        border: 1px solid #48016D;
+
+        &:hover {
+            border: 1px solid #fff;
+            background: transparent;
+            color: $primaryColor;
 
         }
     }
